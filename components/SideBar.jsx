@@ -1,4 +1,5 @@
-import { AuthProvider } from "@/app/lib/AuthProvider";
+"use client";
+import { AuthProvider } from "@/app/lib/AuthContext";
 import Link from "next/link";
 import { useContext } from "react";
 function SideBar({children}) {
