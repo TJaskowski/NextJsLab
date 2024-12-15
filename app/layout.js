@@ -28,9 +28,8 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
       <AuthProvider>
-        {/* <SideBar> {children}</SideBar> */}
+        <SideBar> {children}</SideBar>
         {/* <Footer></Footer> footer at the bottom of the page */}
-        {children}
       </AuthProvider>
       </body>
     </html>
