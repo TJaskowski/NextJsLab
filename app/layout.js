@@ -1,7 +1,6 @@
 import localFont from "next/font/local";
 import "./globals.css";
 import SideBar from "@/components/SideBar";
-import Footer from "@/components/Footer";
 import { AuthProvider } from "./lib/AuthContext";
 
 
@@ -29,7 +28,6 @@ export default function RootLayout({ children }) {
       >
       <AuthProvider>
         <SideBar> {children}</SideBar>
-        {/* <Footer></Footer> footer at the bottom of the page */}
       </AuthProvider>
       </body>
     </html>

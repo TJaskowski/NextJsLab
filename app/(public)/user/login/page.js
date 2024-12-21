@@ -1,12 +1,12 @@
 'use client';
 import { browserSessionPersistence, setPersistence, signInWithEmailAndPassword } from "firebase/auth";
 import {auth} from "@/app/lib/firebase"
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 
 import { useForm } from "react-hook-form";
 
 function LoginForm() {
-//  const returnUrl = useParams().get("returnUrl");
+  const returnUrl = useSearchParams().get("returnUrl");
   const router = useRouter();
 
   const {
@@ -21,7 +21,8 @@ function LoginForm() {
         .then((userCredencial) => {
           console.log("user logged!")
           if (!userCredencial?.user.emailVerified){
-            router.replace('/user/verified')
+            router.replace('/user/')
+            console.log("not verified")
             return;
           }
           if (returnUrl){
