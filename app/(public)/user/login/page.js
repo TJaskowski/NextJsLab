@@ -18,9 +18,9 @@ function LoginForm() {
       setPersistence(auth, browserSessionPersistence)
       .then(()=> {
         signInWithEmailAndPassword(auth, data.email, data.password)
-        .then((userCredencial) => {
+        .then((userCredential) => {
           console.log("user logged!")
-          if (!userCredencial?.user.emailVerified){
+          if (!userCredential.user.emailVerified){
             router.replace('/user/')
             console.log("not verified")
             return;

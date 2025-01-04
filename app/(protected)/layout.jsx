@@ -2,6 +2,7 @@
 import { useAuth } from "@/app/lib/AuthContext";
 import { useLayoutEffect } from "react";
 import { redirect, usePathname } from 'next/navigation';
+import {auth} from "@/app/lib/firebase";
 
 
 function Protected({children}) {
@@ -14,8 +15,8 @@ function Protected({children}) {
             console.log("user not logged!")
             redirect(`/user/login?returnUrl=${returnUrl}`); // check path
         }
-        if(!user?.emailVerified){
-            redirect('/user/verified'); // check path
+        if(user.emailVerified){
+            redirect('/user/login'); // check path
         }
     }, []);
     return ( <>
