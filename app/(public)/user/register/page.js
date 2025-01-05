@@ -1,141 +1,151 @@
-'use client';
+"use client";
 import { useRouter } from 'next/navigation';
-
-import { getAuth, createUserWithEmailAndPassword, sendEmailVerification, signOut } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 import { useAuth } from "@/app/lib/AuthContext";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
-export default function RegisterForm(){
-
-
+export default function RegisterForm() {
   const { user } = useAuth();
   const router = useRouter();
   
   if (user) {
     return null;
   }
-  
+
   const auth = getAuth();
-  
   const [registerError, setRegisterError] = useState(""); //stan błędów rejestracji
-    const { register, handleSubmit} = useForm();
-  
-  
+  const { register, handleSubmit, formState: { errors } } = useForm();
+
   const onSubmit = (data) => {
-    console.log("clicked");
     // walidacja obu równości haseł  
     if (data.password !== data.confirmPassword) {
-        setRegisterError("Passwords do not match!");
-        return;
-      }
+      setRegisterError("Hasła nie są takie same!");
+      return;
+    }
+    
     createUserWithEmailAndPassword(auth, data.email, data.password)
       .then((userCredential) => {
-        console.log("User registered!");
         sendEmailVerification(auth.currentUser)
           .then(() => {
-            console.log("Email verification send!");
             router.push("/user/verify");
-        });
-        
+          });
       })
       .catch((error) => {
         setRegisterError(error.message);
-        console.dir(error);
       });
   };
+
   return (
-    <div className="card items-center shadow-lg p-6 w-100">
-      <h1>Rejestracja</h1>
-      {registerError && (
-          <div className="alert alert-error">
+    <div className="flex justify-center items-center min-h-screen bg-gray-100">
+      <div className="bg-white shadow-lg rounded-lg p-8 max-w-md w-full">
+        <h1 className="text-2xl font-bold text-center text-gray-800 mb-6">
+          Rejestracja
+        </h1>
+        {registerError && (
+          <div className="alert alert-error mb-4 bg-red-100 text-red-600 p-4 rounded">
             <p>{registerError}</p>
-          </div>)}
-      <form className="form-control" onSubmit={handleSubmit(onSubmit)}>
-        <div>
-      <label className="input input-bordered flex items-center gap-2">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 16 16"
-          fill="currentColor"
-          className="h-4 w-4 opacity-70">
-          <path d="M2.5 3A1.5 1.5 0 0 0 1 4.5v.793c.026.009.051.02.076.032L7.674 8.51c.206.1.446.1.652 0l6.598-3.185A.755.755 0 0 1 15 5.293V4.5A1.5 1.5 0 0 0 13.5 3h-11Z" />
-          <path d="M15 6.954 8.978 9.86a2.25 2.25 0 0 1-1.956 0L1 6.954V11.5A1.5 1.5 0 0 0 2.5 13h11a1.5 1.5 0 0 0 1.5-1.5V6.954Z" />
-          </svg>
-        <input  id="email"
-              name="email"
-              type="email"
-              className="grow"
-              placeholder="Email"
-              {...register("email", {
-                required: {
-                  value: true,
-                  message: "Musisz podać adres email!",
-                },
-                maxLength: {
-                  value: 40,
-                  message: " Adres email jest zbyt długi!",
-                },
-                pattern: {
-                  value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-                  message: "Niepoprawny format e-mail",
-                },
-              })}/>
-             
-      </label>
-      <label className="input input-bordered flex items-center gap-2">
-      <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 16 16"
-          fill="currentColor"
-          className="h-4 w-4 opacity-70"
-        >
-          <path
-            fillRule="evenodd"
-            d="M14 6a4 4 0 0 1-4.899 3.899l-1.955 1.955a.5.5 0 0 1-.353.146H5v1.5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5v-2.293a.5.5 0 0 1 .146-.353l3.955-3.955A4 4 0 1 1 14 6Zm-4-2a.75.75 0 0 0 0 1.5.5.5 0 0 1 .5.5.75.75 0 0 0 1.5 0 2 2 0 0 0-2-2Z"
-            clipRule="evenodd"
-          />
-        </svg>
-        <input id="password"
-              name="password"
-              type="password"
-              className="grow"
-              placeholder="Your password"
-              {...register("password", {
-                required: "Hasło jest wymagane!",
-                maxLength: {
-                  value: 20,
-                  message: "Hasło jest za długie!",
-                },
-              })} />
-      </label>
-      <label className="input input-bordered flex items-center gap-2">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 16 16"
-          fill="currentColor"
-          className="h-4 w-4 opacity-70"
-        >
-          <path
-            fillRule="evenodd"
-            d="M14 6a4 4 0 0 1-4.899 3.899l-1.955 1.955a.5.5 0 0 1-.353.146H5v1.5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5v-2.293a.5.5 0 0 1 .146-.353l3.955-3.955A4 4 0 1 1 14 6Zm-4-2a.75.75 0 0 0 0 1.5.5.5 0 0 1 .5.5.75.75 0 0 0 1.5 0 2 2 0 0 0-2-2Z"
-            clipRule="evenodd"
-          />
-        </svg>
-        <input name="confirmPassword" type="password" className="grow" placeholder="Confirm Password"
-        {...register("confirmPassword", {
-            required: "Hasło jest wymagane!",
-            maxLength: {
-              value: 20,
-              message: "Hasło jest za długie!",
-            },
-          })} />
-      </label>
+          </div>
+        )}
+        <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+          <div>
+            <label className="block text-gray-700 font-medium mb-1">
+              Email
+            </label>
+            <div className="relative">
+              <input
+                id="email"
+                name="email"
+                type="email"
+                className="input w-full border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Wprowadź email"
+                {...register("email", {
+                  required: {
+                    value: true,
+                    message: "Musisz podać adres email!",
+                  },
+                  maxLength: {
+                    value: 40,
+                    message: "Adres email jest zbyt długi!",
+                  },
+                  pattern: {
+                    value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                    message: "Niepoprawny format e-mail.",
+                  },
+                })}
+              />
+              {errors.email && (
+                <p className="text-sm text-red-600 mt-1">{errors.email.message}</p>
+              )}
+            </div>
+          </div>
+          <div>
+            <label className="block text-gray-700 font-medium mb-1">
+              Hasło
+            </label>
+            <div className="relative">
+              <input
+                id="password"
+                name="password"
+                type="password"
+                className="input w-full border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Wprowadź hasło"
+                {...register("password", {
+                  required: "Hasło jest wymagane!",
+                  maxLength: {
+                    value: 20,
+                    message: "Hasło jest za długie!",
+                  },
+                })}
+              />
+              {errors.password && (
+                <p className="text-sm text-red-600 mt-1">{errors.password.message}</p>
+              )}
+            </div>
+          </div>
+          <div>
+            <label className="block text-gray-700 font-medium mb-1">
+              Potwierdź hasło
+            </label>
+            <div className="relative">
+              <input
+                name="confirmPassword"
+                type="password"
+                className="input w-full border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Potwierdź hasło"
+                {...register("confirmPassword", {
+                  required: "Potwierdzenie hasła jest wymagane!",
+                  maxLength: {
+                    value: 20,
+                    message: "Hasło jest za długie!",
+                  },
+                })}
+              />
+              {errors.confirmPassword && (
+                <p className="text-sm text-red-600 mt-1">{errors.confirmPassword.message}</p>
+              )}
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 rounded-lg transition duration-200"
+          >
+            Zarejestruj się
+          </button>
+        </form>
+        <div className="text-center mt-4 text-sm text-gray-500">
+          <p>
+            Masz już konto?{" "}
+            <a
+              href="/user/login"
+              className="text-blue-500 hover:underline font-medium"
+            >
+              Zaloguj się
+            </a>
+          </p>
+        </div>
       </div>
-
-      <button type="submit"  className="btn btn-primary " >Zapisz</button>
-      </form>
-
     </div>
   );
 }

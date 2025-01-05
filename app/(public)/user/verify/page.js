@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useEffect, useState } from "react";
 import { getAuth, signOut } from "firebase/auth";
@@ -25,14 +25,27 @@ export default function VerifyEmail() {
   }, [user]);
 
   return (
-    <div className="card items-center shadow-lg p-6 w-100">
-      <h1 className="text-center text-xl font-bold">Email Verification Required</h1>
-      <p className="mt-4">
-        Email not verified. Verify your email by clicking on the link sent to your address: <strong>{userEmail}</strong>.
-      </p>
-      <p className="mt-2 text-sm text-gray-500">
-        You have been logged out for security reasons. Please verify your email and log in again.
-      </p>
+    <div className="flex justify-center items-center min-h-screen bg-gray-100">
+      <div className="bg-white shadow-lg rounded-lg p-8 max-w-sm w-full">
+        <h1 className="text-center text-2xl font-bold text-gray-800 mb-4">Wymagana weryfikacja adresu e-mail</h1>
+        
+        <p className="mt-4 text-gray-700">
+          Twój adres e-mail <strong>{userEmail}</strong> nie został zweryfikowany. Proszę kliknij w link wysłany na ten adres, aby zweryfikować e-mail.
+        </p>
+
+        <p className="mt-2 text-sm text-gray-500">
+          Zostałeś wylogowany z powodu wymogu weryfikacji e-mail. Proszę zweryfikować adres e-mail, a następnie zalogować się ponownie.
+        </p>
+
+        <div className="mt-6 text-center">
+          <a
+            href="/"
+            className="text-blue-600 hover:text-blue-800 font-semibold"
+          >
+            Powrót do strony głównej
+          </a>
+        </div>
+      </div>
     </div>
   );
 }
