@@ -8,7 +8,7 @@ function SideBar({children}) {
         <div className="drawer">
   <input id="my-drawer" type="checkbox" className="drawer-toggle" />
   <div className="drawer-content">
-  <label htmlFor="my-drawer" className="btn btn-primary drawer-button">Menu</label>
+  <label htmlFor="my-drawer" className="btn btn-primary w-auto m-2">Menu</label>
     {children}
   </div>
   <div className="drawer-side">
