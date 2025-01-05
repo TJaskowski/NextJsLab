@@ -20,11 +20,13 @@ function LoginForm() {
         signInWithEmailAndPassword(auth, data.email, data.password)
         .then((userCredential) => {
           console.log("user logged!")
-          if (!userCredential.user.emailVerified){
-            router.replace('/user/')
-            console.log("not verified")
-            return;
-          }
+          
+          // if (!userCredential.user.emailVerified){
+          //   router.replace('/user/verify-email');
+          //   //console.log("not verified")            uncomment after adding verify-email page
+          //   return;
+          // }
+
           if (returnUrl){
             router.push(returnUrl);
           }
@@ -32,6 +34,9 @@ function LoginForm() {
             router.push("/");
           }
         })
+        .catch((error) => {
+          console.log("Error logging in: ", error);
+        });
       })
     };
     return ( 
@@ -90,7 +95,7 @@ function LoginForm() {
           } />
       </label>
       </div>
-      <button type="submit"  className="btn btn-primary w-full m-2" >Zapisz</button>
+      <button type="submit"  className="btn btn-primary w-auto m-2" >Zapisz</button>
 
       </form>
      );

@@ -10,15 +10,12 @@ function Protected({children}) {
     const returnUrl = usePathname();
 
     useLayoutEffect(() => {
-        console.dir(user?.emailVerified);
+        // console.dir(user?.emailVerified);
         if (!user){
-            console.log("user not logged!")
+            // console.log("user not logged!")
             redirect(`/user/login?returnUrl=${returnUrl}`); // check path
         }
-        if(user.emailVerified){
-            redirect('/user/login'); // check path
-        }
-    }, []);
+    }, [user, returnUrl]);
     return ( <>
     { children }
     </> );
