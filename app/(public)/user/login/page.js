@@ -6,14 +6,15 @@ import {
 } from "firebase/auth";
 import { auth } from "@/app/lib/firebase";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 function LoginForm() {
   const returnUrl = useSearchParams().get("returnUrl");
   const router = useRouter();
+  const [firebaseError, setFirebaseError] = useState("");
 
-  const { register, handleSubmit, watch } = useForm();
+  const { register, handleSubmit, formState: {errors} } = useForm();
 
   const onSubmit = (data) => {
     setPersistence(auth, browserSessionPersistence).then(() => {
@@ -35,12 +36,16 @@ function LoginForm() {
         })
         .catch((error) => {
           console.log("Error logging in: ", error);
+          setFirebaseError(error.message);
         });
     });
   };
   return (
     <div className="card items-center shadow-lg p-6 w-100">
       <form className="form-control" onSubmit={handleSubmit(onSubmit)}>
+        {firebaseError && (<div className="alert alert-error mb-4">
+          <p>{firebaseError}</p>
+        </div>)}
         <div>
           <label className="input input-bordered flex items-center gap-2">
             <svg
@@ -74,6 +79,7 @@ function LoginForm() {
               })}
             />
           </label>
+          {errors.email && (<p className="text-error">{errors.email.message}</p>)}
         </div>
         <div>
           <label className="input input-bordered flex items-center gap-2">
@@ -104,8 +110,9 @@ function LoginForm() {
               })}
             />
           </label>
+          {errors.password && (<p className="text-error">{errors.password.message}</p>)}
         </div>
-        <label type="submit"  className="btn btn-primary " >Zapisz</label>
+        <button type="submit"  className="btn btn-primary " >Zaloguj</button>
       </form>
     </div>
   );
