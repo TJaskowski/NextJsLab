@@ -1,58 +1,95 @@
 "use client";
 import { getAuth, updateProfile } from "firebase/auth";
 import { useAuth } from "@/app/lib/AuthContext";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useEffect, useState } from "react";
+import { set, useForm } from "react-hook-form";
 import { db } from "@/app/lib/firebase";
-import { collection,addDoc, doc, setDoc } from "firebase/firestore";
+import { collection,addDoc, doc, setDoc, getDoc } from "firebase/firestore";
 
 export default function UserProfile() {
-  const { user } = useAuth();
+  const { user } = useAuth();   
   const auth = getAuth();
+  const [isLoading, setIsLoading] = useState(true); // Stan do przechowywania informacji o ładowaniu
   const [error, setError] = useState(""); // Stan do przechowywania błędów
 
-  const { register, handleSubmit, formState: { errors } } = useForm({
+  const { 
+    register,
+    setValue,
+    handleSubmit,
+    formState: { errors } } = useForm({
     defaultValues: {
       displayName: user?.displayName || `${user?.email}`,
       email: user?.email || "",
-      street: user?.address?.street || "",
-      city: user?.address?.city || "",
-      zipCode: user?.address?.zipCode || "",
+      street: "",
+      city: "",
+      zipCode: "",
       photoURL: user?.photoURL || "",
     },
   });
 
+
+  useEffect(() => {
+    const fetchAdress = async () => {
+      try {
+        if(user?.uid){
+          const snapshot = await getDoc(doc(db, "users", user?.uid));
+          if(snapshot.exists()){
+            const address = snapshot.data().address;
+            // Ustawienie wartości pól formularza
+            setValue("street", address?.street || "");
+            setValue("city", address?.city || "");
+            setValue("zipCode", address?.zipCode || "");
+          }
+        }
+      } catch (e) {
+        console.error("Error getting document:", e);
+        setError("Wystąpił błąd podczas pobierania danych z Firestore.");
+      }finally{
+        setIsLoading(false);// Wyłączenie stanu ładowania
+      }
+    };
+      fetchAdress();
+    }, [!user?.uid, setValue]);
+
+
   const onSubmit = async  (data) => {
     try {
-      await updateProfile(auth.currentUser, {
+    //   await updateProfile(auth.currentUser, {
+    //   displayName: data.displayName,
+    //   street: data.street,
+    //   city: data.city,
+    //   zipCode: data.zipCode,
+    //   photoURL: data.photoURL,
+    // })
+    //   .then(() => {
+    //     console.log("Profil zaktualizowany");
+    //   })
+    //   .catch((error) => {
+    //     setError(error.message);
+    //   });
+  
+    //Aktualizacja profilu użytkownika w Firebase Auth
+    await updateProfile(auth.currentUser, {
       displayName: data.displayName,
-      street: data.street,
-      city: data.city,
-      zipCode: data.zipCode,
       photoURL: data.photoURL,
-    })
-      .then(() => {
+    });
         console.log("Profil zaktualizowany");
-      })
-      .catch((error) => {
-        setError(error.message);
-      });
-    
-        const docRef = await setDoc(doc(db, "users", user?.uid), {
+
+    await setDoc(doc(db, "users", user?.uid), {
           address: {
             street: data.street,
             city: data.city,
             zipCode: data.zipCode,
           }
       });
-      console.log("Document written with ID: ", docRef?.uid);
+      console.log("Dane uzytkownika zaktualizowane");
     } catch (e) {
+      console.error("Wystąpił błąd podczas aktualizacji danych: ", e);
       if (e.code === "permission-denied") {
         setError("Brak uprawnień do zapisu danych w Firestore.");
       } else {
         setError("Wystąpił błąd: " + e.message);
       }
-      console.error("Error adding document: ", e);
     }
   };
 
@@ -82,6 +119,7 @@ export default function UserProfile() {
                   message: "Nazwa użytkownika jest za długa",
                 },
               })}
+              disabled={isLoading}
             />
             {errors.displayName && (
               <p className="text-sm text-red-600 mt-1">{errors.displayName.message}</p>
@@ -106,6 +144,7 @@ export default function UserProfile() {
             className="input w-full border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Street"
             {...register("street")}
+            disabled={isLoading}
            />
           </div>
           <div>
@@ -115,6 +154,7 @@ export default function UserProfile() {
             className="input w-full border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="City"
             {...register("city") }
+            disabled={isLoading}
            />
           </div>
           <div>
@@ -129,6 +169,7 @@ export default function UserProfile() {
                 message: "Kod pocztowy jest za długi",
               },
             })}
+            disabled={isLoading}
            />
            {errors.zipCode && (
               <p className="text-sm text-red-600 mt-1">{errors.zipCode.message}</p>
@@ -158,8 +199,9 @@ export default function UserProfile() {
           <button
             type="submit"
             className="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 rounded-lg transition duration-200 mt-4"
+            disabled={isLoading}
           >
-            Submit
+            {isLoading ? "Loading..." : "Save"}
           </button>
         </form>
       </div>
