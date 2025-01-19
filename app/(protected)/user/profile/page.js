@@ -3,6 +3,8 @@ import { getAuth, updateProfile } from "firebase/auth";
 import { useAuth } from "@/app/lib/AuthContext";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { db } from "@/app/lib/firebase";
+import { collection,addDoc, doc, setDoc } from "firebase/firestore";
 
 export default function UserProfile() {
   const { user } = useAuth();
@@ -11,15 +13,22 @@ export default function UserProfile() {
 
   const { register, handleSubmit, formState: { errors } } = useForm({
     defaultValues: {
-      displayName: user?.displayName || "",
+      displayName: user?.displayName || `${user?.email}`,
       email: user?.email || "",
+      street: user?.address?.street || "",
+      city: user?.address?.city || "",
+      zipCode: user?.address?.zipCode || "",
       photoURL: user?.photoURL || "",
     },
   });
 
-  const onSubmit = (data) => {
-    updateProfile(auth.currentUser, {
+  const onSubmit = async  (data) => {
+    try {
+      await updateProfile(auth.currentUser, {
       displayName: data.displayName,
+      street: data.street,
+      city: data.city,
+      zipCode: data.zipCode,
       photoURL: data.photoURL,
     })
       .then(() => {
@@ -28,12 +37,29 @@ export default function UserProfile() {
       .catch((error) => {
         setError(error.message);
       });
+    
+        const docRef = await setDoc(doc(db, "users", user?.uid), {
+          address: {
+            street: data.street,
+            city: data.city,
+            zipCode: data.zipCode,
+          }
+      });
+      console.log("Document written with ID: ", docRef?.uid);
+    } catch (e) {
+      if (e.code === "permission-denied") {
+        setError("Brak uprawnień do zapisu danych w Firestore.");
+      } else {
+        setError("Wystąpił błąd: " + e.message);
+      }
+      console.error("Error adding document: ", e);
+    }
   };
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
       <div className="bg-white shadow-lg rounded-lg p-8 max-w-md w-full">
-        <h1 className="text-2xl font-bold text-center text-gray-800 mb-6">Profil użytkownika</h1>
+        <h1 className="text-2xl font-bold text-center text-gray-800 mb-6">User Profile</h1>
         
         {error && (
           <div className="alert alert-error mb-4 bg-red-100 text-red-600 p-4 rounded">
@@ -44,11 +70,11 @@ export default function UserProfile() {
         <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
           {/* Pole displayName */}
           <div>
-            <label className="block text-gray-700 font-medium mb-2">Nazwa użytkownika</label>
+            <label className="block text-gray-700 font-medium mb-2">Display Name</label>
             <input
               type="text"
               className="input w-full border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Nazwa użytkownika"
+              placeholder="Display Name"
               {...register("displayName", {
                 required: "Nazwa użytkownika jest wymagana",
                 maxLength: {
@@ -72,14 +98,50 @@ export default function UserProfile() {
               value={user?.email || ""}
             />
           </div>
+          {/* Pola address */}
+          <div>
+            <label className="block text-gray-700 font-medium mb-2">Street</label>
+           <input
+            type="text"
+            className="input w-full border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Street"
+            {...register("street")}
+           />
+          </div>
+          <div>
+            <label className="block text-gray-700 font-medium mb-2">City</label>
+           <input
+            type="text"
+            className="input w-full border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="City"
+            {...register("city") }
+           />
+          </div>
+          <div>
+            <label className="block text-gray-700 font-medium mb-2">Zip Code</label>
+           <input
+            type="text"
+            className="input w-full border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Zip Code"
+            {...register("zipCode", {
+              maxLength: {
+                value: 6,
+                message: "Kod pocztowy jest za długi",
+              },
+            })}
+           />
+           {errors.zipCode && (
+              <p className="text-sm text-red-600 mt-1">{errors.zipCode.message}</p>
+            )}
+          </div>
 
           {/* Pole photoURL */}
           <div>
-            <label className="block text-gray-700 font-medium mb-2">Adres zdjęcia profilowego</label>
+            <label className="block text-gray-700 font-medium mb-2">Profile Photo</label>
             <input
               type="text"
               className="input w-full border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Adres zdjęcia profilowego"
+              placeholder="Profile Photo URL"
               {...register("photoURL", {
                 pattern: {
                   value: /^(https?:\/\/.*\.(?:png|jpg|jpeg|gif|svg))$/,
@@ -97,7 +159,7 @@ export default function UserProfile() {
             type="submit"
             className="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 rounded-lg transition duration-200 mt-4"
           >
-            Zapisz
+            Submit
           </button>
         </form>
       </div>
