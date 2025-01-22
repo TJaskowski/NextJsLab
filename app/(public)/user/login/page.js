@@ -10,8 +10,7 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 
 function LoginForm() {
-  //const returnUrl = useSearchParams().get("returnUrl");
-  const [returnUrl, setReturnUrl] = useState(null); // Przechowujemy wartość returnUrl
+  const [returnUrl, setReturnUrl] = useState(null); 
   const router = useRouter();
   const [firebaseError, setFirebaseError] = useState("");
 
