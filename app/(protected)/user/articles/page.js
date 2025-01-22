@@ -2,7 +2,7 @@
 import { useAuth } from "@/app/lib/AuthContext";
 import { use, useEffect, useState } from "react";
 import { db } from "@/app/lib/firebase";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { doc, collection, query, where, getDocs } from "firebase/firestore";
 
 export default function UserArcticles() {
     const { user } = useAuth();
@@ -15,11 +15,11 @@ export default function UserArcticles() {
             if (!user?.uid) {
                 return;
             }   
-            console.log("Uzytkownik", user);
             try {
                 if (user?.uid) {
+                    const userRef = doc(db, "users", user.uid);
                     const articlesRef = collection(db, "articles");
-                    const q = query(articlesRef, where("user", "==", `/users/${user.uid}`));
+                    const q = query(articlesRef, where("user", "==", userRef));
                     const querySnapshot = await getDocs(q);
                     const fetchedArticles = querySnapshot.docs.map((doc) => ({
                         id: doc.id,
@@ -33,9 +33,7 @@ export default function UserArcticles() {
             } finally {
                 setIsLoading(false);
             }
-        };
-        console.log("Artykul", articles);
-        
+        };  
         fetchArticles();
     }, [user?.uid]);
 
@@ -57,7 +55,6 @@ export default function UserArcticles() {
                         <li className="p-4 bg-white shadow rounded">
                             <h2 className="text-xl font-bold">{article.title}</h2>
                             <p className="text-gray-800">{article.content}</p>
-                            {/* <p className="text-gray-800">Data utworzenia: {article.date}</p> */}
                         </li>))}
                 </ul>)}
         </div>
