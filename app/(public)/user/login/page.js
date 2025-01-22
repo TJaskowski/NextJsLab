@@ -6,13 +6,21 @@ import {
 } from "firebase/auth";
 import { auth } from "@/app/lib/firebase";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 
 function LoginForm() {
-  const returnUrl = useSearchParams().get("returnUrl");
+  //const returnUrl = useSearchParams().get("returnUrl");
+  const [returnUrl, setReturnUrl] = useState(null); // Przechowujemy wartość returnUrl
   const router = useRouter();
   const [firebaseError, setFirebaseError] = useState("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      setReturnUrl(params.get("returnUrl"));
+    }
+  }, []); 
 
   const {
     register,

@@ -8,14 +8,13 @@ import { useForm } from "react-hook-form";
 export default function RegisterForm() {
   const { user } = useAuth();
   const router = useRouter();
-  
-  if (user) {
-    return null;
-  }
-
   const auth = getAuth();
   const [registerError, setRegisterError] = useState(""); //stan błędów rejestracji
   const { register, handleSubmit, formState: { errors } } = useForm();
+
+  if (user) {
+    return null;
+  }
 
   const onSubmit = (data) => {
     // walidacja obu równości haseł  

@@ -49,25 +49,11 @@ export default function UserProfile() {
       }
     };
       fetchAdress();
-    }, [!user?.uid, setValue]);
+    }, [user?.uid, setValue]);
 
 
   const onSubmit = async  (data) => {
     try {
-    //   await updateProfile(auth.currentUser, {
-    //   displayName: data.displayName,
-    //   street: data.street,
-    //   city: data.city,
-    //   zipCode: data.zipCode,
-    //   photoURL: data.photoURL,
-    // })
-    //   .then(() => {
-    //     console.log("Profil zaktualizowany");
-    //   })
-    //   .catch((error) => {
-    //     setError(error.message);
-    //   });
-  
     //Aktualizacja profilu użytkownika w Firebase Auth
     await updateProfile(auth.currentUser, {
       displayName: data.displayName,

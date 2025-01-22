@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { getAuth, signOut } from "firebase/auth";
 import { useAuth } from "@/app/lib/AuthContext";
+import Link from "next/link";
 
 export default function VerifyEmail() {
   const { user } = useAuth();
@@ -38,12 +39,11 @@ export default function VerifyEmail() {
         </p>
 
         <div className="mt-6 text-center">
-          <a
-            href="/"
-            className="text-blue-600 hover:text-blue-800 font-semibold"
-          >
+         <Link href="/" passHref>
+          <a className="text-blue-600 hover:text-blue-800 font-semibold">
             Powrót do strony głównej
           </a>
+        </Link>
         </div>
       </div>
     </div>

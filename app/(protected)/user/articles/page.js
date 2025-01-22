@@ -52,7 +52,7 @@ export default function UserArcticles() {
             ) : (
                 <ul className="space-y-4">
                     {articles.map((article) => (
-                        <li className="p-4 bg-white shadow rounded">
+                        <li key={article.id} className="p-4 bg-white shadow rounded">
                             <h2 className="text-xl font-bold">{article.title}</h2>
                             <p className="text-gray-800">{article.content}</p>
                         </li>))}
