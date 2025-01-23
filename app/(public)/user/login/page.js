@@ -24,12 +24,12 @@ function LoginForm() {
     setPersistence(auth, browserSessionPersistence).then(() => {
       signInWithEmailAndPassword(auth, data.email, data.password)
         .then((userCredential) => {
-          console.log("user logged!");
-
-          if (returnUrl) {
-            router.push(returnUrl);
+          const user = userCredential.user;
+    
+          if(!user.emailVerified) {
+            router.push("/user/verify");
           } else {
-            router.push("/");
+            router.push(returnUrl || "/user/profile");
           }
         })
         .catch((error) => {

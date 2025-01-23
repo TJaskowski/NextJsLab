@@ -39,10 +39,8 @@ export default function VerifyEmail() {
         </p>
 
         <div className="mt-6 text-center">
-         <Link href="/" passHref>
-          <a className="text-blue-600 hover:text-blue-800 font-semibold">
+         <Link href="/" passHref className="text-blue-600 hover:text-blue-800 font-semibold">
             Powrót do strony głównej
-          </a>
         </Link>
         </div>
       </div>
