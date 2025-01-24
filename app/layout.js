@@ -28,9 +28,7 @@ export default function RootLayout({ children }) {
       >
         <AuthProvider>
           <div className="flex flex-col h-screen bg-gray-100">
-            <Suspense>
               <SideBar> {children}</SideBar>
-            </Suspense>
           </div>
         </AuthProvider>
       </body>
