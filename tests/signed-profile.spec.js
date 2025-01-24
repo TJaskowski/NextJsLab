@@ -18,3 +18,9 @@ test("authenticated user can access profile", async ({ page }) => {
   await page.click('label.drawer-overlay[for="my-drawer"]');
   await expect(page.locator('h1')).toContainText('User Profile');
 });
+
+test("not authenticated user cannot access profile", async ({ page }) => {
+  await page.goto('http://localhost:3000/user/profile');
+  await expect(page).toHaveURL('http://localhost:3000/user/login?returnUrl=/user/profile');
+  await expect(page.locator('h1')).toContainText('Zaloguj się');
+});
