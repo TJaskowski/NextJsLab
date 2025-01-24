@@ -12,6 +12,9 @@ test("authenticated user can access profile", async ({ page }) => {
     }
   }, sessionStorage);
   await page.reload();
-  await page.goto('http://localhost:3000/user/profile');
+  await page.waitForTimeout(1000);
+  await page.click("text=menu");
+  await page.click('text=Profile');
+  await page.click('label.drawer-overlay[for="my-drawer"]');
   await expect(page.locator('h1')).toContainText('User Profile');
 });
